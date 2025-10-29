@@ -1,20 +1,42 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Header from './Header';
+import validate from '../utils/validate';
+import {getAuth,createUserWithEmailAndPassword} from 'firebase/auth';
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
+  const [errorMessage, setErrorMessage] = useState(null);
+
+  const name = useRef(null);
+  const email = useRef(null);
+  const password = useRef(null);
 
   const toggleSignInForm = () => {
     setIsSignInForm(!isSignInForm);
+    setErrorMessage(null);
+  };
+
+  const handleButtonClick = () => {
+    const message = validate(
+      name?.current?.value,
+      email.current.value,
+      password.current.value,
+      isSignInForm
+    );
+    setErrorMessage(message);
+
+    if (message) return; // Stop if invalid
+
+    // Success - you can add login/signup logic here
+    console.log('✅ Form submitted successfully!');
   };
 
   return (
     <>
       <div className="relative w-full h-screen flex flex-col">
-        {/* Header */}
         <Header />
 
-        {/* Background with overlay */}
+        {/* Background */}
         <div className="absolute inset-0">
           <img
             className="w-full h-full object-cover brightness-50"
@@ -26,13 +48,15 @@ const Login = () => {
 
         {/* Login Box */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/75 backdrop-blur-sm text-white rounded-xl shadow-2xl px-10 py-8 w-[90%] sm:w-[60%] md:w-[35%] transition-all duration-300 hover:scale-[1.02]">
-          <form className="flex flex-col items-center justify-center">
+          <form onSubmit={(e) => e.preventDefault()} className="flex flex-col items-center justify-center">
             <h2 className="text-3xl font-bold mb-6 tracking-wide text-red-600 drop-shadow-md">
               {isSignInForm ? 'Sign In' : 'Create Account'}
             </h2>
 
+            {/* Full Name only for Sign Up */}
             {!isSignInForm && (
               <input
+                ref={name}
                 type="text"
                 placeholder="Full Name"
                 className="p-3 m-2 w-full rounded bg-gray-700 placeholder-gray-300 text-white focus:ring-2 focus:ring-red-500 outline-none transition"
@@ -40,17 +64,28 @@ const Login = () => {
             )}
 
             <input
+              ref={email}
               type="email"
               placeholder="Email Address"
               className="p-3 m-2 w-full rounded bg-gray-700 placeholder-gray-300 text-white focus:ring-2 focus:ring-red-500 outline-none transition"
             />
+
             <input
+              ref={password}
               type="password"
               placeholder="Password"
               className="p-3 m-2 w-full rounded bg-gray-700 placeholder-gray-300 text-white focus:ring-2 focus:ring-red-500 outline-none transition"
             />
 
+            {/* Error message */}
+            {errorMessage && (
+              <p className="text-red-500 text-sm mt-2 font-semibold">
+                {errorMessage}
+              </p>
+            )}
+
             <button
+              onClick={handleButtonClick}
               className="p-3 mt-6 bg-red-600 hover:bg-red-700 w-full rounded font-semibold text-lg shadow-md transition-transform duration-200 hover:scale-[1.03]"
             >
               {isSignInForm ? 'Sign In' : 'Sign Up'}
@@ -93,9 +128,12 @@ const Login = () => {
           </form>
         </div>
 
-        {/* Subtle Footer */}
+        {/* Footer */}
         <footer className="absolute bottom-4 w-full text-center text-gray-500 text-xs">
-          <p>© 2025 Netflix Clone • Designed by <span className="text-red-500 font-medium">Riya ❤️</span></p>
+          <p>
+            © 2025 Netflix Clone • Designed by{' '}
+            <span className="text-red-500 font-medium">Riya ❤️</span>
+          </p>
         </footer>
       </div>
     </>
