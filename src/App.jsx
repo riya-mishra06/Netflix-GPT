@@ -1,14 +1,16 @@
-import React from 'react'
-import Header from './components/Header'
-import Login from './components/Login'
+
+import Body from "./components/Body"
+import store  from "../src/utils/store"
+import { Provider } from 'react-redux'
+
 
 const App = () => {
-  return (
-    
+  return ( 
     <>
     <div>
-      <Header/>
-      <Login/>
+    <Provider store={store}>
+       <Body/>
+    </Provider>
     </div>
     </>
   )
@@ -16,17 +18,3 @@ const App = () => {
 
 export default App
 
-//Features
-//Login/Sign Up
-// signin / sign up form
-// redirect to NavigatorLogin
-// -browser (after authentication)
-//  hedaer 
-//  main movie
-// tailer in background
-//  title  description
-//moviesuggestions
-//movieLists
-
-// netflixgp
-// searcg BarPropmovie suggestions

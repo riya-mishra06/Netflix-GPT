@@ -1,10 +1,15 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Login from './Login'
 import Browse from './Browse'
-import {RouterProvider} from 'react-router-dom'
+import {RouterProvider, useNavigate} from 'react-router-dom'
 import {createBrowserRouter } from 'react-router-dom'
+import {useDispatch}  from "react-redux"
+
 
 const Body = () => {
+
+ const dispatch = useDispatch();
+
     const appRouter = createBrowserRouter([{
         path:"/",element:<Login/>
     },
@@ -12,9 +17,11 @@ const Body = () => {
         path:"/browse",element:<Browse/>
     },
 ])
+
   return (
   <>
   <div>
+   
    <RouterProvider router={appRouter}/>
   </div>
   </>
