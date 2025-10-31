@@ -42,7 +42,6 @@ const Login = () => {
       // Sign In
       signInWithEmailAndPassword(auth, email.current.value, password.current.value)
         .then((userCredential) => {
-          console.log(userCredential.user);
           alert('✅ Signed in successfully!');
         })
         .catch((error) => {
