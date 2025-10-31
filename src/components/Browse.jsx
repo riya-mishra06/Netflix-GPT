@@ -3,6 +3,7 @@ import useNowPlayingMovie   from "../hooks/useNowPlayingMovie"
 import SecondaryContainer from './SecondaryContainer'
 import ImpContainer from './ImpContainer';
 import usePopularMovies from "../hooks/usePopularMovies"
+import GPTSearch from './GPTSearch';
 
 
 const Browse = () => {
@@ -12,7 +13,8 @@ usePopularMovies();
     <>
     <div className=''>
       <Header/>
-    <ImpContainer/>
+      <GPTSearch/>
+      <ImpContainer/>
     
       <SecondaryContainer/>
    

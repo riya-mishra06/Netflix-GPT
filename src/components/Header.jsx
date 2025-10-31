@@ -3,10 +3,10 @@ import { auth } from "../utils/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {addUser, removeUser} from "../utils/userSlice"
-import {LOGO,dp} from "../utils/constants"
+import { addUser, removeUser } from "../utils/userSlice"
+import { LOGO, dp } from "../utils/constants"
 
-const Header = () => { 
+const Header = () => {
   const dispatch = useDispatch()
 
   const navigate = useNavigate();
@@ -22,31 +22,31 @@ const Header = () => {
         navigate("/error");
       });
   };
+ const handleGptSearchClick = () => {
+  
+ }
 
-useEffect(() => {
-  const unsubscrible = onAuthStateChanged(auth, (user) => {
-  if (user) {
-    const {uid,email,displayname} = user;
-    dispatch(addUser({uid:uid,email:email,displayname:displayname}))
-  navigate("/browse")
-  } else {
-   dispatch(removeUser());
-    navigate("/")
-  }
-});
-//this is will be called when component unmount
-return () => unsubscrible();
-},[])
-
-
-
+  useEffect(() => {
+    const unsubscrible = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const { uid, email, displayname } = user;
+        dispatch(addUser({ uid: uid, email: email, displayname: displayname }))
+        navigate("/browse")
+      } else {
+        dispatch(removeUser());
+        navigate("/")
+      }
+    });
+    //this is will be called when component unmount
+    return () => unsubscrible();
+  }, [])
   return (
     <>
       <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-b from-black/90 via-black/70 to-transparent px-8 py-4 flex justify-between items-center">
         {/* Netflix Logo */}
         <img
           className="w-32 sm:w-40 cursor-pointer hover:scale-105 transition-transform duration-300"
-          src={LOGO}   alt="Netflix Logo"
+          src={LOGO} alt="Netflix Logo"
           onClick={() => navigate("/browse")}
         />
 
@@ -55,11 +55,15 @@ return () => unsubscrible();
           <div className="flex items-center gap-4">
             {/* Profile Avatar */}
             <div className="relative group">
+              <button className="py-2 px-4 m-2 bg-purple-700 text-white 
+              rounded-lg cursor-pointer"
+              onClick={handleGptSearchClick}>
+                GPT Search</button>
               <img
                 className="h-10 w-10 sm:h-11 sm:w-11 rounded-md object-cover border border-gray-600 cursor-pointer hover:scale-110 transition-transform duration-300"
-                src={dp}         alt="User Icon"
+                src={dp} alt="User Icon"
               />
-              
+
               {/* Tooltip */}
               <div className="absolute hidden group-hover:flex flex-col bg-black/80 text-white text-xs px-3 py-2 rounded-md top-12 right-0 shadow-md border border-gray-700">
                 <p className="whitespace-nowrap hover:text-red-400 cursor-pointer">Profile</p>
