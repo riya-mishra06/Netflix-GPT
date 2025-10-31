@@ -4,7 +4,8 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {addUser, removeUser} from "../utils/userSlice"
-import {LOGO,DP} from "../utils/constants"
+import {LOGO,dp} from "../utils/constants"
+
 const Header = () => { 
   const dispatch = useDispatch()
 
@@ -56,7 +57,7 @@ return () => unsubscrible();
             <div className="relative group">
               <img
                 className="h-10 w-10 sm:h-11 sm:w-11 rounded-md object-cover border border-gray-600 cursor-pointer hover:scale-110 transition-transform duration-300"
-                src={DP}         alt="User Icon"
+                src={dp}         alt="User Icon"
               />
               
               {/* Tooltip */}

@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react'
 import Login from './Login'
 import Browse from './Browse'
 import {RouterProvider, useNavigate} from 'react-router-dom'
@@ -21,7 +20,6 @@ const Body = () => {
   return (
   <>
   <div>
-   
    <RouterProvider router={appRouter}/>
   </div>
   </>

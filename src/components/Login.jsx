@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const name = useRef(null);
   const email = useRef(null);
@@ -33,7 +33,6 @@ const Login = () => {
       // Sign Up
       createUserWithEmailAndPassword(auth, email.current.value, password.current.value)
         .then((userCredential) => {
-          console.log(userCredential.user);
           alert('✅ Account created successfully!');
         })
         .catch((error) => {
