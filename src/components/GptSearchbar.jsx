@@ -1,8 +1,9 @@
 import React, { useRef, useState } from "react";
 import lang from "../utils/languageContant";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { GEMINI_KEY } from "../utils/constants";
+import { API_OPTIONS, GEMINI_KEY } from "../utils/constants";
+import { addGptMovieResults } from "../utils/gptSlice";
 
 const genAI = new GoogleGenerativeAI(GEMINI_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
@@ -10,17 +11,22 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 let isCalling = false;
 
 const GptSearchbar = () => {
+  const dispatch = useDispatch();
   const langkey = useSelector((store) => store.config?.lang) || "en";
   const searchText = useRef();
   const [chats, setChats] = useState([]);
 
-
-  //search
-  const searchMovieTMDB = async(movie) => {
+  // Search movie in TMDB
+  const searchMovieTMDB = async (movie) => {
     const data = await fetch(
-      ""
-    )
-  }
+      "https://api.themoviedb.org/3/search/movie?query=" +
+        movie +
+        "&include_adult=false&language=en-US&page=1",
+      API_OPTIONS
+    );
+    const json = await data.json();
+    return json.results;
+  };
 
   const handleGptSearchClick = async () => {
     if (isCalling) return;
@@ -29,7 +35,7 @@ const GptSearchbar = () => {
     const userQuery = searchText.current.value;
     if (!userQuery.trim()) return;
 
-    // Push User Message
+    // Push User
     setChats((prev) => [...prev, { role: "user", text: userQuery }]);
 
     const prompt =
@@ -44,12 +50,22 @@ const GptSearchbar = () => {
 
       const output = await response.response.text();
 
-      // Push AI Message
+      // Push AI reply
       setChats((prev) => [...prev, { role: "ai", text: output }]);
+
+      // Extract Movie Names
+      const gptMovies = output.split(",").map((m) => m.trim());
+
+      // Search each movie in TMDB
+      const promiseArray = gptMovies.map((movie) => searchMovieTMDB(movie));
+      const tmdbResults = await Promise.all(promiseArray);
+
+      console.log("TMDB Movies 👉", tmdbResults); // you will get array of movie objects here
+      dispatch(addGptMovieResults({movieNames: gptMovies, movieResults: tmdbResults}));
     } catch (err) {
       setChats((prev) => [
         ...prev,
-        { role: "ai", text: "⚠️ Error / Rate limit. Try again!" },
+        { role: "ai", text: "⚠ Error / Rate limit. Try again!" },
       ]);
     }
 
@@ -68,29 +84,30 @@ const GptSearchbar = () => {
         <input
           ref={searchText}
           type="text"
-          className="flex-1 px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-700"
+          className="flex-1 px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-400 
+          focus:outline-none focus:ring-2 focus:ring-red-700"
           placeholder={lang[langkey]?.gptSearchPlaceholder}
           autoComplete="off"
         />
 
         <button
           onClick={handleGptSearchClick}
-          className="py-2 px-6 bg-red-700 hover:bg-red-800 text-white rounded-lg font-semibold transition-all"
+          className="py-2 px-6 bg-red-700 hover:bg-red-800 rounded-lg"
         >
           {lang[langkey]?.search}
         </button>
       </form>
 
-      {/* Chat Bubbles */}
+      {/* Chat */}
       <div className="w-full max-w-2xl flex flex-col gap-3 mt-6">
         {chats.map((chat, i) => (
           <div
             key={i}
-            className={`max-w-[85%] p-3 rounded-lg text-sm leading-relaxed
-            ${chat.role === "user"
+            className={`max-w-[85%] p-3 rounded-lg text-sm leading-relaxed ${
+              chat.role === "user"
                 ? "ml-auto bg-red-600 text-white rounded-br-none"
                 : "mr-auto bg-gray-800 border border-gray-600 rounded-bl-none"
-              }`}
+            }`}
           >
             {chat.text}
           </div>
