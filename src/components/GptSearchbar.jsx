@@ -16,12 +16,10 @@ const GptSearchbar = () => {
   const searchText = useRef();
   const [chats, setChats] = useState([]);
 
-  // Search movie in TMDB
+  // Search TMDB
   const searchMovieTMDB = async (movie) => {
     const data = await fetch(
-      "https://api.themoviedb.org/3/search/movie?query=" +
-        movie +
-        "&include_adult=false&language=en-US&page=1",
+      `https://api.themoviedb.org/3/search/movie?query=${movie}&include_adult=false&language=en-US&page=1`,
       API_OPTIONS
     );
     const json = await data.json();
@@ -35,13 +33,11 @@ const GptSearchbar = () => {
     const userQuery = searchText.current.value;
     if (!userQuery.trim()) return;
 
-    // Push User
     setChats((prev) => [...prev, { role: "user", text: userQuery }]);
 
     const prompt =
-      "Act as a movie recommendation system & suggest movies based on the query: " +
-      userQuery +
-      ". Only give top 5 movies, comma separated. Example: Gadar, Sholay, Sanam Teri Kasam, 1920, Golmaal";
+      `Recommend top 5 movies based on: ${userQuery}. 
+       Format: Movie1, Movie2, Movie3, Movie4, Movie5`;
 
     try {
       const response = await model.generateContent({
@@ -49,64 +45,57 @@ const GptSearchbar = () => {
       });
 
       const output = await response.response.text();
-
-      // Push AI reply
       setChats((prev) => [...prev, { role: "ai", text: output }]);
 
-      // Extract Movie Names
       const gptMovies = output.split(",").map((m) => m.trim());
-
-      // Search each movie in TMDB
-      const promiseArray = gptMovies.map((movie) => searchMovieTMDB(movie));
+      const promiseArray = gptMovies.map(searchMovieTMDB);
       const tmdbResults = await Promise.all(promiseArray);
 
-      console.log("TMDB Movies 👉", tmdbResults); // you will get array of movie objects here
-      dispatch(addGptMovieResults({movieNames: gptMovies, movieResults: tmdbResults}));
+      dispatch(addGptMovieResults({ movieNames: gptMovies, movieResults: tmdbResults }));
     } catch (err) {
-      setChats((prev) => [
-        ...prev,
-        { role: "ai", text: "⚠ Error / Rate limit. Try again!" },
-      ]);
+      setChats((prev) => [...prev, { role: "ai", text: "⚠️ Try again" }]);
     }
 
     searchText.current.value = "";
-    setTimeout(() => (isCalling = false), 6000);
+    setTimeout(() => (isCalling = false), 5000);
   };
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center py-10 bg-black text-white">
-
-      {/* Input Box */}
+    <div className="w-full flex flex-col items-center">
+      
+      {/* Search Box */}
       <form
-        className="flex items-center gap-3 p-6 bg-[#111] rounded-lg w-full max-w-2xl shadow-xl"
+        className="w-full max-w-md sm:max-w-xl md:max-w-2xl flex gap-2 sm:gap-3
+                   bg-black/70 p-3 sm:p-4 rounded-lg backdrop-blur-md
+                   border border-white/20 shadow-lg"
         onSubmit={(e) => e.preventDefault()}
       >
         <input
           ref={searchText}
           type="text"
-          className="flex-1 px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-400 
-          focus:outline-none focus:ring-2 focus:ring-red-700"
+          className="flex-1 px-4 py-2 rounded-md bg-gray-900 text-white placeholder-gray-400
+                     focus:outline-none focus:ring-2 focus:ring-red-600 transition"
           placeholder={lang[langkey]?.gptSearchPlaceholder}
-          autoComplete="off"
         />
 
         <button
           onClick={handleGptSearchClick}
-          className="py-2 px-6 bg-red-700 hover:bg-red-800 rounded-lg"
+          className="px-4 sm:px-6 py-2 rounded-md bg-red-600 hover:bg-red-700 transition font-semibold"
         >
           {lang[langkey]?.search}
         </button>
       </form>
 
-      {/* Chat */}
-      <div className="w-full max-w-2xl flex flex-col gap-3 mt-6">
+      {/* Chat Bubbles */}
+      <div className="w-full max-w-md sm:max-w-xl md:max-w-2xl flex flex-col gap-3 mt-6">
         {chats.map((chat, i) => (
           <div
             key={i}
-            className={`max-w-[85%] p-3 rounded-lg text-sm leading-relaxed ${
+            className={`max-w-[85%] p-3 sm:p-4 rounded-lg text-sm sm:text-base leading-relaxed shadow
+            ${
               chat.role === "user"
                 ? "ml-auto bg-red-600 text-white rounded-br-none"
-                : "mr-auto bg-gray-800 border border-gray-600 rounded-bl-none"
+                : "mr-auto bg-gray-900 text-gray-200 border border-gray-700 rounded-bl-none"
             }`}
           >
             {chat.text}
