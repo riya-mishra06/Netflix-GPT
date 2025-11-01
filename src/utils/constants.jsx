@@ -16,8 +16,7 @@ export const API_OPTIONS =  {
 
 export const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 export const IMG_CDN_URL = "https://image.tmdb.org/t/p/w500/";
-
-
+export const GEMINI_KEY = "AIzaSyD1coblGV5i4S1xaQDvwr6LK81_g05OaUE";
 export const LANG = [
   //  <option value="en">English</option>
   //           <option value="hindi">Hindi</option>
